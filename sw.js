@@ -1,4 +1,4 @@
-const CACHE_NAME = "dobo-patrol-v3";
+const CACHE_NAME = "dobo-patrol-v4";
 const ASSETS = [
   "./index.html",
   "./styles.css",
@@ -27,14 +27,14 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
+    fetch(event.request)
+      .then((res) => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return res;
-      }).catch(() => cached);
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
