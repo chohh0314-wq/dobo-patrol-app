@@ -132,7 +132,37 @@
     remarkInput.value = buildAutoRemark();
   });
 
-  /* ---------- GPS ---------- */
+  /* ---------- GPS & reverse geocoding ---------- */
+  const KAKAO_REST_KEY = "8debd5ead09208eca5cd0d6415af63c5";
+
+  async function reverseGeocode(lat, lon) {
+    const url = `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${lon}&y=${lat}`;
+    const res = await fetch(url, { headers: { Authorization: `KakaoAK ${KAKAO_REST_KEY}` } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const doc = data.documents && data.documents[0];
+    if (!doc) return null;
+    const jibun = doc.address && doc.address.address_name;
+    const road = doc.road_address && doc.road_address.address_name;
+    return jibun || road || null;
+  }
+
+  async function applyLocation(lat, lon, sourceLabel) {
+    locationInput.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    gpsStatus.textContent = `${sourceLabel} · 주소 변환 중...`;
+    try {
+      const address = await reverseGeocode(lat, lon);
+      if (address) {
+        locationInput.value = address;
+        gpsStatus.textContent = `${sourceLabel} · 주소로 자동 입력했습니다 · 필요시 직접 수정하세요`;
+      } else {
+        gpsStatus.textContent = `${sourceLabel} · 주소를 찾지 못해 좌표로 표시했습니다 · 필요시 직접 수정하세요`;
+      }
+    } catch (err) {
+      gpsStatus.textContent = `${sourceLabel} · 주소 변환 실패(인터넷 연결 확인) · 좌표로 표시했습니다`;
+    }
+  }
+
   gpsBtn.addEventListener("click", () => {
     if (!navigator.geolocation) {
       gpsStatus.textContent = "이 기기에서는 위치 기능을 사용할 수 없습니다.";
@@ -140,10 +170,9 @@
     }
     gpsStatus.textContent = "위치 가져오는 중...";
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const { latitude, longitude } = pos.coords;
-        locationInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-        gpsStatus.textContent = `GPS 정확도 약 ${Math.round(pos.coords.accuracy)}m · 필요시 직접 수정하세요`;
+        await applyLocation(latitude, longitude, `GPS 정확도 약 ${Math.round(pos.coords.accuracy)}m`);
       },
       (err) => {
         gpsStatus.textContent = `위치를 가져오지 못했습니다 (${err.message})`;
@@ -243,8 +272,7 @@
     gpsStatus.textContent = "사진에서 위치 정보 확인 중...";
     const gps = await readExifGps(file);
     if (gps) {
-      locationInput.value = `${gps.lat.toFixed(6)}, ${gps.lon.toFixed(6)}`;
-      gpsStatus.textContent = "사진의 위치 정보로 자동 입력했습니다 · 필요시 직접 수정하세요";
+      await applyLocation(gps.lat, gps.lon, "사진의 위치 정보");
     } else {
       gpsStatus.textContent = "사진에 위치 정보가 없습니다 · '위치 가져오기'를 누르거나 직접 입력하세요";
     }
