@@ -1,4 +1,4 @@
-const CACHE_NAME = "dobo-patrol-v6";
+const CACHE_NAME = "dobo-patrol-v7";
 const ASSETS = [
   "./index.html",
   "./styles.css",
@@ -17,7 +17,9 @@ const ASSETS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(ASSETS.map((url) => fetch(url, { cache: "reload" }).then((res) => cache.put(url, res))))
+    )
   );
   self.skipWaiting();
 });
@@ -34,7 +36,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-store" })
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
