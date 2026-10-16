@@ -424,6 +424,16 @@
   });
 
   /* ---------- Excel export ---------- */
+  function lineBreakdownText(lb) {
+    const parts = [];
+    if (lb.one) parts.push(`일방 ${lb.one}EA`);
+    if (lb.d90) parts.push(`90° ${lb.d90}EA`);
+    if (lb.t) parts.push(`T ${lb.t}EA`);
+    if (lb.d45) parts.push(`45° ${lb.d45}EA`);
+    if (lb.end) parts.push(`마감 ${lb.end}EA`);
+    return parts.join(", ");
+  }
+
   async function exportXlsx() {
     const entries = await dbAll();
     if (!entries.length) {
@@ -435,8 +445,16 @@
     const today = new Date();
     aoa.push([`${today.getFullYear()}년 도보순찰 점검표`]);
     aoa.push([]);
-    aoa.push(["구간", "위치", "점검대상", "", "", "", "", "", "비고"]);
-    aoa.push(["", "", "밸브", "전기방식", "라인마크", "배관표지판", "GIS", "기타", ""]);
+    aoa.push(["구간", "위치", "점검대상", "", "", "", "", "", "", "", "", "", "", ""]);
+    aoa.push([
+      "", "",
+      "밸브", "메모",
+      "전기방식", "메모",
+      "라인마크", "메모",
+      "배관표지판", "메모",
+      "GIS", "메모",
+      "기타", "메모",
+    ]);
 
     let lastSection = null;
     const totals = { valve: 0, elec: 0, line: 0, sign: 0, gis: 0, etc: 0 };
@@ -449,12 +467,17 @@
         showSection,
         e.location || "",
         e.valve || "",
+        e.valveNote || "",
         e.elec || "",
+        e.elecNote || "",
         e.lineTotal || "",
+        lineBreakdownText(e.lineBreakdown) || "",
         e.sign || "",
+        e.signNote || "",
         e.gis || "",
+        e.gisNote || "",
         e.etcCount || "",
-        e.remark || "",
+        e.etcNote || "",
       ]);
 
       totals.valve += e.valve;
@@ -466,21 +489,30 @@
     });
 
     aoa.push([
-      "계", "", totals.valve || "", totals.elec || "", totals.line || "",
-      totals.sign || "", totals.gis || "", totals.etc || "", "",
+      "계", "",
+      totals.valve || "", "",
+      totals.elec || "", "",
+      totals.line || "", "",
+      totals.sign || "", "",
+      totals.gis || "", "",
+      totals.etc || "", "",
     ]);
 
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } },
       { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } },
       { s: { r: 2, c: 1 }, e: { r: 3, c: 1 } },
-      { s: { r: 2, c: 2 }, e: { r: 2, c: 7 } },
-      { s: { r: 2, c: 8 }, e: { r: 3, c: 8 } },
+      { s: { r: 2, c: 2 }, e: { r: 2, c: 13 } },
     ];
     ws["!cols"] = [
-      { wch: 6 }, { wch: 28 }, { wch: 7 }, { wch: 9 },
-      { wch: 9 }, { wch: 10 }, { wch: 6 }, { wch: 7 }, { wch: 36 },
+      { wch: 6 }, { wch: 26 },
+      { wch: 6 }, { wch: 16 },
+      { wch: 8 }, { wch: 16 },
+      { wch: 8 }, { wch: 22 },
+      { wch: 9 }, { wch: 16 },
+      { wch: 6 }, { wch: 16 },
+      { wch: 6 }, { wch: 16 },
     ];
 
     const wb = XLSX.utils.book_new();
