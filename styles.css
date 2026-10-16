@@ -246,6 +246,7 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   flex-direction: column;
 }
+.map-modal[hidden] { display: none; }
 .map-modal-bar {
   display: flex;
   align-items: center;
