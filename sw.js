@@ -1,4 +1,4 @@
-const CACHE_NAME = "dobo-patrol-v1";
+const CACHE_NAME = "dobo-patrol-v2";
 const ASSETS = [
   "./index.html",
   "./styles.css",
