@@ -45,22 +45,44 @@
   <section class="card">
     <h2 class="section-title">점검대상</h2>
 
-    <div class="field-grid">
-      <div class="field">
+    <div class="cat-row">
+      <div class="cat-qty">
         <label for="valveCount">밸브</label>
-        <input id="valveCount" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="valveCount" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
-      <div class="field">
+      <div class="cat-note">
+        <label for="valveNote">메모</label>
+        <input id="valveNote" type="text" placeholder="예: 포장불량" />
+      </div>
+    </div>
+    <div class="cat-row">
+      <div class="cat-qty">
         <label for="elecCount">전기방식</label>
-        <input id="elecCount" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="elecCount" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
-      <div class="field">
+      <div class="cat-note">
+        <label for="elecNote">메모</label>
+        <input id="elecNote" type="text" placeholder="예: 단자 부식" />
+      </div>
+    </div>
+    <div class="cat-row">
+      <div class="cat-qty">
         <label for="signCount">배관표지판</label>
-        <input id="signCount" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="signCount" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
-      <div class="field">
+      <div class="cat-note">
+        <label for="signNote">메모</label>
+        <input id="signNote" type="text" placeholder="예: 표지판 머리 훼손" />
+      </div>
+    </div>
+    <div class="cat-row">
+      <div class="cat-qty">
         <label for="gisCount">GIS</label>
-        <input id="gisCount" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="gisCount" type="number" min="0" placeholder="0" inputmode="numeric" />
+      </div>
+      <div class="cat-note">
+        <label for="gisNote">메모</label>
+        <input id="gisNote" type="text" placeholder="예: GIS 위치 오차" />
       </div>
     </div>
 
@@ -68,33 +90,35 @@
     <div class="field-grid field-grid-5">
       <div class="field">
         <label for="lmOne">일방</label>
-        <input id="lmOne" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="lmOne" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
       <div class="field">
         <label for="lm90">90°</label>
-        <input id="lm90" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="lm90" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
       <div class="field">
         <label for="lmT">T</label>
-        <input id="lmT" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="lmT" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
       <div class="field">
         <label for="lm45">45°</label>
-        <input id="lm45" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="lm45" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
       <div class="field">
         <label for="lmEnd">마감</label>
-        <input id="lmEnd" type="number" min="0" value="0" inputmode="numeric" />
+        <input id="lmEnd" type="number" min="0" placeholder="0" inputmode="numeric" />
       </div>
     </div>
 
-    <div class="field full">
-      <label for="etcCount">기타 (개수)</label>
-      <input id="etcCount" type="number" min="0" value="0" inputmode="numeric" />
-    </div>
-    <div class="field full">
-      <label for="etcNote">기타 설명</label>
-      <input id="etcNote" type="text" placeholder="예: 지반침하" />
+    <div class="cat-row">
+      <div class="cat-qty">
+        <label for="etcCount">기타</label>
+        <input id="etcCount" type="number" min="0" placeholder="0" inputmode="numeric" />
+      </div>
+      <div class="cat-note">
+        <label for="etcNote">메모</label>
+        <input id="etcNote" type="text" placeholder="예: 지반침하" />
+      </div>
     </div>
   </section>
 

@@ -73,9 +73,13 @@
   const photoPreview = el("photoPreview");
   const photoClearBtn = el("photoClearBtn");
   const valveCount = el("valveCount");
+  const valveNote = el("valveNote");
   const elecCount = el("elecCount");
+  const elecNote = el("elecNote");
   const signCount = el("signCount");
+  const signNote = el("signNote");
   const gisCount = el("gisCount");
+  const gisNote = el("gisNote");
   const lmOne = el("lmOne");
   const lm90 = el("lm90");
   const lmT = el("lmT");
@@ -116,10 +120,10 @@
     if (num(lm45)) lineParts.push(`45° ${num(lm45)}EA`);
     if (num(lmEnd)) lineParts.push(`마감 ${num(lmEnd)}EA`);
     if (lineParts.length) parts.push(lineParts.join(", "));
-    if (num(etcCount) || etcNote.value.trim()) {
-      const etcText = etcNote.value.trim();
-      parts.push(etcText ? `기타 ${num(etcCount)}EA(${etcText})` : `기타 ${num(etcCount)}EA`);
-    }
+    [valveNote, elecNote, signNote, gisNote, etcNote].forEach((input) => {
+      const text = input.value.trim();
+      if (text) parts.push(text);
+    });
     return parts.join(", ");
   }
 
@@ -148,8 +152,86 @@
     );
   });
 
+  /* ---------- EXIF GPS extraction ---------- */
+  function rationalToDeg(view, offset, littleEndian) {
+    const parts = [];
+    for (let i = 0; i < 3; i++) {
+      const num = view.getUint32(offset + i * 8, littleEndian);
+      const den = view.getUint32(offset + i * 8 + 4, littleEndian);
+      parts.push(den ? num / den : 0);
+    }
+    return parts[0] + parts[1] / 60 + parts[2] / 3600;
+  }
+
+  async function readExifGps(file) {
+    try {
+      const buf = await file.slice(0, 256 * 1024).arrayBuffer();
+      const view = new DataView(buf);
+      if (view.getUint16(0) !== 0xffd8) return null;
+
+      let offset = 2;
+      let exifOffset = null;
+      while (offset < view.byteLength - 4) {
+        if (view.getUint8(offset) !== 0xff) break;
+        const marker = view.getUint8(offset + 1);
+        if (marker === 0xe1) {
+          const segStart = offset + 4;
+          if (
+            view.getUint32(segStart) === 0x45786966 &&
+            view.getUint16(segStart + 4) === 0x0000
+          ) {
+            exifOffset = segStart + 6;
+          }
+          break;
+        }
+        if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+          offset += 2;
+          continue;
+        }
+        const segLen = view.getUint16(offset + 2);
+        offset += 2 + segLen;
+      }
+      if (exifOffset === null) return null;
+
+      const tiffStart = exifOffset;
+      const byteOrder = view.getUint16(tiffStart);
+      const little = byteOrder === 0x4949;
+      const ifd0Offset = tiffStart + view.getUint32(tiffStart + 4, little);
+
+      let gpsIfdOffset = null;
+      const numEntries0 = view.getUint16(ifd0Offset, little);
+      for (let i = 0; i < numEntries0; i++) {
+        const entryOffset = ifd0Offset + 2 + i * 12;
+        const tag = view.getUint16(entryOffset, little);
+        if (tag === 0x8825) {
+          gpsIfdOffset = tiffStart + view.getUint32(entryOffset + 8, little);
+          break;
+        }
+      }
+      if (gpsIfdOffset === null) return null;
+
+      let latRef = null, lonRef = null, lat = null, lon = null;
+      const numEntriesGps = view.getUint16(gpsIfdOffset, little);
+      for (let i = 0; i < numEntriesGps; i++) {
+        const entryOffset = gpsIfdOffset + 2 + i * 12;
+        const tag = view.getUint16(entryOffset, little);
+        const valueOffset = tiffStart + view.getUint32(entryOffset + 8, little);
+        if (tag === 1) latRef = String.fromCharCode(view.getUint8(entryOffset + 8));
+        else if (tag === 3) lonRef = String.fromCharCode(view.getUint8(entryOffset + 8));
+        else if (tag === 2) lat = rationalToDeg(view, valueOffset, little);
+        else if (tag === 4) lon = rationalToDeg(view, valueOffset, little);
+      }
+      if (lat === null || lon === null) return null;
+      if (latRef === "S") lat = -lat;
+      if (lonRef === "W") lon = -lon;
+      return { lat, lon };
+    } catch (err) {
+      return null;
+    }
+  }
+
   /* ---------- Photo ---------- */
-  photoInput.addEventListener("change", () => {
+  photoInput.addEventListener("change", async () => {
     const file = photoInput.files[0];
     if (!file) return;
     currentPhotoBlob = file;
@@ -157,6 +239,15 @@
     photoPreview.src = url;
     photoPreview.hidden = false;
     photoClearBtn.hidden = false;
+
+    gpsStatus.textContent = "사진에서 위치 정보 확인 중...";
+    const gps = await readExifGps(file);
+    if (gps) {
+      locationInput.value = `${gps.lat.toFixed(6)}, ${gps.lon.toFixed(6)}`;
+      gpsStatus.textContent = "사진의 위치 정보로 자동 입력했습니다 · 필요시 직접 수정하세요";
+    } else {
+      gpsStatus.textContent = "사진에 위치 정보가 없습니다 · '위치 가져오기'를 누르거나 직접 입력하세요";
+    }
   });
 
   photoClearBtn.addEventListener("click", () => {
@@ -174,16 +265,20 @@
     photoInput.value = "";
     photoPreview.hidden = true;
     photoClearBtn.hidden = true;
-    valveCount.value = 0;
-    elecCount.value = 0;
-    signCount.value = 0;
-    gisCount.value = 0;
-    lmOne.value = 0;
-    lm90.value = 0;
-    lmT.value = 0;
-    lm45.value = 0;
-    lmEnd.value = 0;
-    etcCount.value = 0;
+    valveCount.value = "";
+    valveNote.value = "";
+    elecCount.value = "";
+    elecNote.value = "";
+    signCount.value = "";
+    signNote.value = "";
+    gisCount.value = "";
+    gisNote.value = "";
+    lmOne.value = "";
+    lm90.value = "";
+    lmT.value = "";
+    lm45.value = "";
+    lmEnd.value = "";
+    etcCount.value = "";
     etcNote.value = "";
     remarkInput.value = "";
     updateLineTotal();
@@ -196,9 +291,13 @@
       section: sectionInput.value.trim(),
       location: locationInput.value.trim(),
       valve: num(valveCount),
+      valveNote: valveNote.value.trim(),
       elec: num(elecCount),
+      elecNote: elecNote.value.trim(),
       sign: num(signCount),
+      signNote: signNote.value.trim(),
       gis: num(gisCount),
+      gisNote: gisNote.value.trim(),
       lineBreakdown: {
         one: num(lmOne),
         d90: num(lm90),
@@ -219,6 +318,7 @@
     }
 
     await dbPut(entry);
+    if (entry.section) localStorage.setItem("dobo-last-section", entry.section);
     resetFormForNextPoint();
     await refreshList();
   });
@@ -403,6 +503,8 @@
   }
 
   /* ---------- init ---------- */
+  const lastSection = localStorage.getItem("dobo-last-section");
+  if (lastSection) sectionInput.value = lastSection;
   updateLineTotal();
   refreshList();
 })();
