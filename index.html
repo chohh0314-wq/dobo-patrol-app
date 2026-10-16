@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>도보순찰 점검 앱</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#215e38" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="appbar">
+  <h1>도보순찰 점검</h1>
+  <div class="count-badge" id="entryCount">0건</div>
+</header>
+
+<main>
+  <section class="card">
+    <label class="field-label" for="sectionInput">구간</label>
+    <input id="sectionInput" type="text" placeholder="예: 1" inputmode="numeric" />
+  </section>
+
+  <section class="card">
+    <label class="field-label" for="locationInput">위치</label>
+    <div class="row-inline">
+      <input id="locationInput" type="text" placeholder="GPS 자동 입력 또는 직접 입력" />
+      <button type="button" id="gpsBtn" class="btn-secondary">위치 가져오기</button>
+    </div>
+    <div class="hint" id="gpsStatus"></div>
+  </section>
+
+  <section class="card">
+    <label class="field-label">사진</label>
+    <div class="photo-row">
+      <label class="photo-pick">
+        <input id="photoInput" type="file" accept="image/*" capture="environment" hidden />
+        <span>📷 사진 촬영</span>
+      </label>
+      <img id="photoPreview" class="photo-preview" hidden />
+      <button type="button" id="photoClearBtn" class="btn-text" hidden>삭제</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">점검대상</h2>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="valveCount">밸브</label>
+        <input id="valveCount" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="elecCount">전기방식</label>
+        <input id="elecCount" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="signCount">배관표지판</label>
+        <input id="signCount" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="gisCount">GIS</label>
+        <input id="gisCount" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+    </div>
+
+    <h3 class="sub-title">라인마크 <span id="lineTotal" class="line-total">(합계 0)</span></h3>
+    <div class="field-grid field-grid-5">
+      <div class="field">
+        <label for="lmOne">일방</label>
+        <input id="lmOne" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="lm90">90°</label>
+        <input id="lm90" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="lmT">T</label>
+        <input id="lmT" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="lm45">45°</label>
+        <input id="lm45" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="lmEnd">마감</label>
+        <input id="lmEnd" type="number" min="0" value="0" inputmode="numeric" />
+      </div>
+    </div>
+
+    <div class="field full">
+      <label for="etcCount">기타 (개수)</label>
+      <input id="etcCount" type="number" min="0" value="0" inputmode="numeric" />
+    </div>
+    <div class="field full">
+      <label for="etcNote">기타 설명</label>
+      <input id="etcNote" type="text" placeholder="예: 지반침하" />
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row-inline">
+      <label class="field-label" for="remarkInput">비고</label>
+      <button type="button" id="remarkAutoBtn" class="btn-secondary">자동생성</button>
+    </div>
+    <textarea id="remarkInput" rows="2" placeholder="자동생성 버튼을 누르면 입력된 수량으로 문구가 채워집니다."></textarea>
+  </section>
+
+  <button type="button" id="saveBtn" class="btn-primary">저장하고 다음 지점</button>
+
+  <section class="card">
+    <div class="row-inline">
+      <h2 class="section-title">저장된 지점 목록</h2>
+      <button type="button" id="clearAllBtn" class="btn-text danger">전체 삭제</button>
+    </div>
+    <ul id="entryList" class="entry-list"></ul>
+  </section>
+
+  <div class="export-bar">
+    <button type="button" id="exportXlsxBtn" class="btn-primary">엑셀로 내보내기</button>
+    <button type="button" id="exportPhotosBtn" class="btn-secondary">사진 전체 저장(zip)</button>
+  </div>
+</main>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
