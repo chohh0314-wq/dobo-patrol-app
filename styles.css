@@ -201,6 +201,73 @@ button { font-family: inherit; cursor: pointer; }
 
 .empty-msg { color: var(--muted); font-size: 13px; text-align: center; padding: 10px 0; }
 
+.map-toggle-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+}
+.map-toggle-icon { font-size: 14px; color: var(--muted); transition: transform 0.15s ease; }
+.map-toggle-btn[aria-expanded="true"] .map-toggle-icon { transform: rotate(180deg); }
+
+.map-panel { margin-top: 10px; }
+.map-thumb-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.map-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  font-size: 12px;
+  color: var(--text);
+}
+.map-thumb img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--card-bg);
+}
+
+.map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0,0,0,0.92);
+  display: flex;
+  flex-direction: column;
+}
+.map-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px calc(12px + env(safe-area-inset-top, 0px));
+  padding-top: max(12px, env(safe-area-inset-top));
+  color: #fff;
+}
+.map-modal-bar #mapModalCloseBtn { color: #fff; font-size: 14px; }
+.map-modal-body {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.map-modal-body img {
+  max-width: 100%;
+  height: auto;
+}
+
 .export-bar {
   position: fixed;
   bottom: 0;

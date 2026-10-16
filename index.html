@@ -22,6 +22,52 @@
   </section>
 
   <section class="card">
+    <button type="button" id="mapToggleBtn" class="row-inline map-toggle-btn">
+      <span class="section-title">구간 참고지도</span>
+      <span id="mapToggleIcon" class="map-toggle-icon">▾</span>
+    </button>
+    <div id="mapPanel" class="map-panel" hidden>
+      <h3 class="sub-title">예산</h3>
+      <div class="map-thumb-row">
+        <button type="button" class="map-thumb" data-src="maps/yesan-1-3.png" data-label="예산 1~3구간">
+          <img src="maps/yesan-1-3.png" alt="예산 1~3구간 지도" />
+          <span>1~3구간</span>
+        </button>
+        <button type="button" class="map-thumb" data-src="maps/yesan-4.png" data-label="예산 4구간">
+          <img src="maps/yesan-4.png" alt="예산 4구간 지도" />
+          <span>4구간</span>
+        </button>
+        <button type="button" class="map-thumb" data-src="maps/yesan-5.png" data-label="예산 5구간">
+          <img src="maps/yesan-5.png" alt="예산 5구간 지도" />
+          <span>5구간</span>
+        </button>
+      </div>
+      <h3 class="sub-title">홍성</h3>
+      <div class="map-thumb-row">
+        <button type="button" class="map-thumb" data-src="maps/hongseong-1-4.png" data-label="홍성 1~4구간">
+          <img src="maps/hongseong-1-4.png" alt="홍성 1~4구간 지도" />
+          <span>1~4구간</span>
+        </button>
+        <button type="button" class="map-thumb" data-src="maps/hongseong-5.png" data-label="홍성 5구간">
+          <img src="maps/hongseong-5.png" alt="홍성 5구간 지도" />
+          <span>5구간</span>
+        </button>
+      </div>
+      <div class="hint">지도를 누르면 크게 볼 수 있습니다.</div>
+    </div>
+  </section>
+
+  <div id="mapModal" class="map-modal" hidden>
+    <div class="map-modal-bar">
+      <span id="mapModalLabel"></span>
+      <button type="button" id="mapModalCloseBtn" class="btn-text">✕ 닫기</button>
+    </div>
+    <div class="map-modal-body">
+      <img id="mapModalImg" src="" alt="" />
+    </div>
+  </div>
+
+  <section class="card">
     <label class="field-label" for="locationInput">위치</label>
     <div class="row-inline">
       <input id="locationInput" type="text" placeholder="GPS 자동 입력 또는 직접 입력" />

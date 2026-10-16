@@ -1,4 +1,4 @@
-const CACHE_NAME = "dobo-patrol-v4";
+const CACHE_NAME = "dobo-patrol-v5";
 const ASSETS = [
   "./index.html",
   "./styles.css",
@@ -7,7 +7,12 @@ const ASSETS = [
   "./vendor/xlsx.full.min.js",
   "./vendor/jszip.min.js",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./maps/yesan-1-3.png",
+  "./maps/yesan-4.png",
+  "./maps/yesan-5.png",
+  "./maps/hongseong-1-4.png",
+  "./maps/hongseong-5.png"
 ];
 
 self.addEventListener("install", (event) => {

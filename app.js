@@ -132,6 +132,35 @@
     remarkInput.value = buildAutoRemark();
   });
 
+  /* ---------- Reference maps ---------- */
+  const mapToggleBtn = el("mapToggleBtn");
+  const mapToggleIcon = el("mapToggleIcon");
+  const mapPanel = el("mapPanel");
+  const mapModal = el("mapModal");
+  const mapModalImg = el("mapModalImg");
+  const mapModalLabel = el("mapModalLabel");
+  const mapModalCloseBtn = el("mapModalCloseBtn");
+
+  mapToggleBtn.addEventListener("click", () => {
+    const expanded = !mapPanel.hidden;
+    mapPanel.hidden = expanded;
+    mapToggleBtn.setAttribute("aria-expanded", String(!expanded));
+    mapToggleIcon.textContent = expanded ? "▾" : "▴";
+  });
+
+  document.querySelectorAll(".map-thumb").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      mapModalImg.src = btn.dataset.src;
+      mapModalImg.alt = btn.dataset.label;
+      mapModalLabel.textContent = btn.dataset.label;
+      mapModal.hidden = false;
+    });
+  });
+
+  mapModalCloseBtn.addEventListener("click", () => {
+    mapModal.hidden = true;
+  });
+
   /* ---------- GPS & reverse geocoding ---------- */
   const KAKAO_REST_KEY = "8debd5ead09208eca5cd0d6415af63c5";
 
