@@ -177,12 +177,13 @@
   }
 
   async function applyLocation(lat, lon, sourceLabel) {
-    locationInput.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    const coordText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    locationInput.value = coordText;
     gpsStatus.textContent = `${sourceLabel} · 주소 변환 중...`;
     try {
       const address = await reverseGeocode(lat, lon);
       if (address) {
-        locationInput.value = address;
+        locationInput.value = `${address} (${coordText})`;
         gpsStatus.textContent = `${sourceLabel} · 주소로 자동 입력했습니다 · 필요시 직접 수정하세요`;
       } else {
         gpsStatus.textContent = `${sourceLabel} · 주소를 찾지 못해 좌표로 표시했습니다 · 필요시 직접 수정하세요`;
